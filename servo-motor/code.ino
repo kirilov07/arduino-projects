@@ -1,45 +1,77 @@
-// Servo Motor Control — Sweep + Serial angle input
-// Wiring: Signal→Pin9, VCC→5V, GND→GND
+// Pan-Tilt Servo Controller — Serial command protocol
+// Commands: PAN:<0-180>  TILT:<0-180>  CENTER  SWEEP
+// Wiring: PAN servo→Pin9, TILT servo→Pin10
 
 #include <Servo.h>
 
-Servo myServo;
-const int SERVO_PIN = 9;
+Servo servoPan;
+Servo servoTilt;
+
+const int PAN_PIN  = 9;
+const int TILT_PIN = 10;
+
+int currentPan  = 90;
+int currentTilt = 90;
+
+void smoothMove(Servo &servo, int &current, int target, int stepDelay = 8) {
+  int step = (target > current) ? 1 : -1;
+  while (current != target) {
+    current += step;
+    servo.write(current);
+    delay(stepDelay);
+  }
+}
+
+void parseCommand(String cmd) {
+  cmd.trim();
+  cmd.toUpperCase();
+
+  if (cmd.startsWith("PAN:")) {
+    int angle = constrain(cmd.substring(4).toInt(), 0, 180);
+    smoothMove(servoPan, currentPan, angle);
+    Serial.print("PAN -> "); Serial.println(angle);
+
+  } else if (cmd.startsWith("TILT:")) {
+    int angle = constrain(cmd.substring(5).toInt(), 0, 180);
+    smoothMove(servoTilt, currentTilt, angle);
+    Serial.print("TILT -> "); Serial.println(angle);
+
+  } else if (cmd == "CENTER") {
+    smoothMove(servoPan,  currentPan,  90);
+    smoothMove(servoTilt, currentTilt, 90);
+    Serial.println("Centered (90, 90)");
+
+  } else if (cmd == "SWEEP") {
+    Serial.println("Sweeping...");
+    for (int a = 0; a <= 180; a += 2) {
+      servoPan.write(a); servoTilt.write(a); delay(15);
+    }
+    for (int a = 180; a >= 0; a -= 2) {
+      servoPan.write(a); servoTilt.write(a); delay(15);
+    }
+    currentPan = currentTilt = 0;
+    Serial.println("Sweep done");
+
+  } else {
+    Serial.print("Unknown: "); Serial.println(cmd);
+    Serial.println("Commands: PAN:<0-180>  TILT:<0-180>  CENTER  SWEEP");
+  }
+}
 
 void setup() {
   Serial.begin(9600);
-  myServo.attach(SERVO_PIN);
-  myServo.write(90); // Start at center
+  servoPan.attach(PAN_PIN);
+  servoTilt.attach(TILT_PIN);
+  servoPan.write(90);
+  servoTilt.write(90);
   delay(500);
-  Serial.println("Servo ready. Sweeping...");
-  Serial.println("Type an angle (0-180) + Enter to set position.");
+  Serial.println("Pan-Tilt Controller Ready");
+  Serial.println("Commands: PAN:<0-180>  TILT:<0-180>  CENTER  SWEEP");
 }
 
 void loop() {
-  // Continuous sweep
-  for (int angle = 0; angle <= 180; angle += 2) {
-    myServo.write(angle);
-    delay(15);
-    if (Serial.available()) break; // Interrupt sweep on input
-  }
-  for (int angle = 180; angle >= 0; angle -= 2) {
-    myServo.write(angle);
-    delay(15);
-    if (Serial.available()) break;
-  }
-
-  // Serial angle control
   if (Serial.available()) {
-    int angle = Serial.parseInt();
-    Serial.read(); // consume newline
-    if (angle >= 0 && angle <= 180) {
-      myServo.write(angle);
-      Serial.print("Set to: ");
-      Serial.print(angle);
-      Serial.println("°");
-      delay(2000); // Hold position before resuming sweep
-    } else {
-      Serial.println("Invalid angle. Enter 0–180.");
-    }
+    String cmd = Serial.readStringUntil('\n');
+    parseCommand(cmd);
   }
 }
