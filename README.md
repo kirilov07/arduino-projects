@@ -10,7 +10,7 @@
 
 </div>
 
-Each folder is a self-contained project: wiring diagram, explanation, working code, and a photo or video demonstrating the result. Built and tested on real hardware.
+Each folder is a self-contained project: wiring diagram, pipeline, working code, and a photo or video demonstrating the result. Built and tested on real hardware.
 
 ---
 
@@ -25,22 +25,22 @@ Each folder is a self-contained project: wiring diagram, explanation, working co
 | [infrared-sensor](./infrared-sensor/) | IR Obstacle Sensor | 2WD robot with obstacle avoidance |
 | [pir-alarm](./pir-alarm/) | HC-SR501 PIR | Motion-triggered alarm with escalating buzzer tone |
 | [gas-sensor](./gas-sensor/) | MQ-2 | Gas/smoke detection with PPM readout and fan relay |
-| [hall-rpm](./hall-rpm/) | A3144 Hall Effect | Hardware-interrupt tachometer with min/max/avg tracking |
-| [mpu6050-gyro](./mpu6050-gyro/) | MPU6050 IMU | Complementary filter, tilt angles for Serial Plotter |
-| [lm35-temperature](./lm35-temperature/) | LM35 Analog Sensor | Precision thermometer with trend indicator and alerts |
+| [hall-rpm](./hall-rpm/) | A3144 Hall Effect | Hardware-interrupt tachometer — min/max/avg tracking |
+| [mpu6050-gyro](./mpu6050-gyro/) | MPU6050 IMU | Complementary filter tilt angles for Serial Plotter |
+| [lm35-temperature](./lm35-temperature/) | LM35 Analog | Precision thermometer with trend indicator and alerts |
 
 ### Actuators & Output
 
 | Folder | Sensor / Component | What it does |
 |--------|--------------------|-------------|
 | [servo-motor](./servo-motor/) | SG90 / MG996R | Pan-tilt control with smooth interpolation |
-| [relay-control](./relay-control/) | 5V Relay Module | 4-channel active-LOW control with pulse and toggle |
+| [relay-control](./relay-control/) | 5V Relay Module | 4-channel active-LOW control — pulse and toggle |
 | [stepper-motor](./stepper-motor/) | 28BYJ-48 + ULN2003 | Precise rotation: ROT / REV / SPIN commands |
 | [led-matrix](./led-matrix/) | MAX7219 8×8 Matrix | Scrolling text and animations via MD_Parola |
 | [neopixel-strip](./neopixel-strip/) | WS2812B + FastLED | 6 effects: rainbow, fire, meteor, breathing, chase, solid |
 | [shift-register](./shift-register/) | 74HC595 IC | 8-LED chaser, binary counter, Knight Rider from 3 pins |
 | [oled-monitor](./oled-monitor/) | SSD1306 OLED 0.96" | Live temperature/humidity with bar chart history |
-| [touch-lamp](./touch-lamp/) | TTP223 + MOSFET | Single tap / double tap / hold gesture lamp control |
+| [touch-lamp](./touch-lamp/) | TTP223 + MOSFET | Tap / double-tap / hold gesture lamp dimmer |
 | [radar-scanner](./radar-scanner/) | HC-SR04 + Servo | 180° sweep radar with Processing visualizer sketch |
 
 ### Communication & Control
@@ -50,11 +50,26 @@ Each folder is a self-contained project: wiring diagram, explanation, working co
 | [rfid-access](./rfid-access/) | MFRC522 SPI | UID-based access control with green/red LED + buzzer |
 | [rtc-clock](./rtc-clock/) | DS3231 + LCD I2C | Real-time clock with temperature and serial time-set |
 | [keypad-lock](./keypad-lock/) | 4×4 Keypad + LCD | PIN-protected relay with 3-fail lockout |
-| [bluetooth-control](./bluetooth-control/) | HC-05 + SoftwareSerial | Wireless LED control via phone or BT terminal app |
-| [ir-remote](./ir-remote/) | TSOP38238 + IRremote | Decode remote buttons and map to actions; LEARN mode |
+| [bluetooth-control](./bluetooth-control/) | HC-05 SoftwareSerial | Wireless LED control via phone or BT terminal |
+| [ir-remote](./ir-remote/) | TSOP38238 + IRremote | Decode remote buttons to actions — LEARN mode |
 | [joystick-controller](./joystick-controller/) | KY-023 Joystick | 2-axis pan-tilt servo with deadzone and smooth motion |
 | [sound-reactive](./sound-reactive/) | Analog Mic + FastLED | VU meter with rolling noise floor and beat detection |
-| [plant-watering](./plant-watering/) | Capacitive Soil + Relay | Auto-watering with dry-threshold check and cooldown |
+| [plant-watering](./plant-watering/) | Capacitive Soil + Relay | Auto-watering with dry-threshold and cooldown |
+
+### Advanced
+
+| Folder | Sensor / Component | What it does |
+|--------|--------------------|-------------|
+| [pid-temperature](./pid-temperature/) | MAX6675 + SSR + LCD | Full PID closed-loop temperature controller ±0.5°C |
+| [weather-station](./weather-station/) | BME280 + RTC + SD Card | Weather station with timestamped CSV logging + OLED |
+| [midi-controller](./midi-controller/) | Leonardo + 8 Pots + 8 Btns | Class-compliant USB MIDI device — DAW-ready |
+| [pid-line-follower](./pid-line-follower/) | 5× TCRT5000 + L298N | PID-controlled line following robot |
+| [fingerprint-lock](./fingerprint-lock/) | AS608 + Relay + LCD | Biometric door lock — enroll/delete/list fingerprints |
+| [power-monitor](./power-monitor/) | INA219 + OLED | V/A/W/Wh real-time power logger with rolling average |
+| [cnc-plotter](./cnc-plotter/) | 2× 28BYJ-48 + Servo | 2-axis CNC pen plotter — G-code over Serial |
+| [obstacle-avoider](./obstacle-avoider/) | HC-SR04 + Servo + L298N | 5-angle scan-and-navigate autonomous robot |
+| [frequency-counter](./frequency-counter/) | Timer1 ICP + PWM | Hardware frequency counter 1Hz–8MHz + signal gen |
+| [env-dashboard](./env-dashboard/) | BME280 + BH1750 + CCS811 | Multi-sensor air quality dashboard — JSON serial |
 
 ---
 
@@ -63,8 +78,8 @@ Each folder is a self-contained project: wiring diagram, explanation, working co
 Each project follows this layout:
 
 ```
-sensor-name/
-├── README.md        ← wiring diagram, pipeline, how to run
+project-name/
+├── README.md        ← wiring diagram, Mermaid pipeline, how to run
 ├── code.ino         ← Arduino sketch
 └── assets/          ← photos, videos, wiring diagrams
 ```
@@ -73,7 +88,7 @@ sensor-name/
 
 ## Hardware used
 
-- Arduino Uno / Mega 2560
+- Arduino Uno / Mega 2560 / Leonardo
 - Breadboard + jumper wires
 - Sensors and components listed per project
 
